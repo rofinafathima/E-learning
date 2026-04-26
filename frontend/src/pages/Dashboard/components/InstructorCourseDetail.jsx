@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_URL from '../../../config';
 import { useParams } from 'react-router-dom';
 import { FileText, Plus, BookOpen, Clock } from 'lucide-react';
 
@@ -22,12 +23,12 @@ const InstructorCourseDetail = () => {
 
   const fetchCourseDetails = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/courses');
+      const res = await axios.get(`${API_URL}/api/courses`);
       const found = res.data.find(c => c._id === id);
       setCourse(found);
       setMaterials(found.materials || []);
       
-      const assignRes = await axios.get(`http://localhost:5000/api/assignments/course/${id}`);
+      const assignRes = await axios.get(`${API_URL}/api/assignments/course/${id}`);
       setAssignments(assignRes.data);
     } catch (err) {
       console.error(err);
@@ -42,7 +43,7 @@ const InstructorCourseDetail = () => {
     if (file) formData.append('file', file);
 
     try {
-      await axios.post(`http://localhost:5000/api/courses/${id}/materials/upload`, formData, {
+      await axios.post(`${API_URL}/api/courses/${id}/materials/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setShowMaterialForm(false);
@@ -66,7 +67,7 @@ const InstructorCourseDetail = () => {
     if (assignFile) formData.append('file', assignFile);
 
     try {
-      await axios.post('http://localhost:5000/api/assignments', formData, {
+      await axios.post(`${API_URL}/api/assignments`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setShowAssignmentForm(false);

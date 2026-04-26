@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_URL from '../../../config';
 import { useAuth } from '../../../context/AuthContext';
 import { CheckSquare, Clock, Calendar, ArrowRight, Plus } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -13,14 +14,14 @@ const AssignmentList = () => {
   useEffect(() => {
     const fetchAssignments = async () => {
       try {
-        const courseRes = await axios.get('http://localhost:5000/api/courses');
+        const courseRes = await axios.get(`${API_URL}/api/courses`);
         const myCourses = courseRes.data.filter(c => 
           user.role === 'instructor' ? c.instructor._id === user.id : c.students.includes(user.id)
         );
         
         let allAssignments = [];
         for (const course of myCourses) {
-          const assignRes = await axios.get(`http://localhost:5000/api/assignments/course/${course._id}`);
+          const assignRes = await axios.get(`${API_URL}/api/assignments/course/${course._id}`);
           const withCourse = assignRes.data.map(a => ({ ...a, courseTitle: course.title }));
           allAssignments = [...allAssignments, ...withCourse];
         }
@@ -28,7 +29,7 @@ const AssignmentList = () => {
 
         // Fetch submissions
         if (user.role === 'student') {
-          const subRes = await axios.get('http://localhost:5000/api/submissions/my');
+          const subRes = await axios.get(`${API_URL}/api/submissions/my`);
           setSubmissions(subRes.data);
         }
       } catch (err) {

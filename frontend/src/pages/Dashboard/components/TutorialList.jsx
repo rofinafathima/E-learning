@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_URL from '../../../config';
 import { useAuth } from '../../../context/AuthContext';
 import { BookOpen, FileText, Download, ExternalLink, PlayCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -11,7 +12,7 @@ const TutorialList = () => {
   useEffect(() => {
     const fetchTutorials = async () => {
       try {
-        const courseRes = await axios.get('http://localhost:5000/api/courses');
+        const courseRes = await axios.get(`${API_URL}/api/courses`);
         const myCourses = courseRes.data.filter(c => 
           user.role === 'instructor' ? c.instructor._id === user.id : c.students.includes(user.id)
         );

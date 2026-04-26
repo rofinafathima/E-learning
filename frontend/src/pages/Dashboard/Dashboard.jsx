@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import API_URL from '../../config';
 import { useAuth } from '../../context/AuthContext';
 // ... rest of imports
 import { 
@@ -56,7 +57,7 @@ const Dashboard = () => {
   const handleCreateCourse = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5000/api/courses', newCourse);
+      await axios.post(`${API_URL}/api/courses`, newCourse);
       setShowCourseModal(false);
       setNewCourse({ title: '', description: '' });
       window.location.reload(); // Refresh to show new course
@@ -88,6 +89,19 @@ const Dashboard = () => {
             <>
               <div style={{ height: '1px', background: 'var(--glass-border)', margin: '20px 0' }} />
               <SidebarItem icon={Settings} label="Admin Panel" path="/dashboard/admin" active={location.pathname.includes('/admin')} />
+            </>
+          )}
+
+          {user?.role === 'instructor' && (
+            <>
+              <div style={{ height: '1px', background: 'var(--glass-border)', margin: '20px 0' }} />
+              <button 
+                onClick={() => setShowCourseModal(true)}
+                className="btn btn-primary" 
+                style={{ width: '100%', justifyContent: 'center', marginTop: '10px' }}
+              >
+                <PlusCircle size={18} /> Create Course
+              </button>
             </>
           )}
         </nav>
@@ -125,7 +139,7 @@ const Dashboard = () => {
 
         <Routes>
           <Route path="/" element={<Overview user={user} />} />
-          <Route path="/courses" element={<CourseList />} />
+          <Route path="/courses" element={<CourseList setShowCourseModal={setShowCourseModal} />} />
           <Route path="/assignments" element={<AssignmentList />} />
           <Route path="/tutorials" element={<TutorialList />} />
           <Route path="/test/:assignmentId" element={<TestSubmission />} />
@@ -138,6 +152,52 @@ const Dashboard = () => {
           />
         </Routes>
       </main>
+
+      {/* Create Course Modal */}
+      {showCourseModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
+          <div className="glass card animate-fade" style={{ width: '100%', maxWidth: '450px' }}>
+            <h3 style={{ fontSize: '1.5rem', marginBottom: '24px', background: 'linear-gradient(45deg, #6366f1, #22d3ee)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+              Create New Course
+            </h3>
+            <form onSubmit={handleCreateCourse}>
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem' }}>Course Title</label>
+                <input 
+                  type="text" 
+                  placeholder="e.g. Advanced Web Development" 
+                  value={newCourse.title}
+                  onChange={(e) => setNewCourse({...newCourse, title: e.target.value})}
+                  required
+                />
+              </div>
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem' }}>Description</label>
+                <textarea 
+                  placeholder="What will students learn?" 
+                  style={{ height: '120px', resize: 'none' }}
+                  value={newCourse.description}
+                  onChange={(e) => setNewCourse({...newCourse, description: e.target.value})}
+                  required
+                />
+              </div>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button type="submit" className="btn btn-primary" style={{ flex: 1, justifyContent: 'center' }}>
+                  Create Course
+                </button>
+                <button 
+                  type="button" 
+                  className="btn glass" 
+                  style={{ flex: 1, justifyContent: 'center' }}
+                  onClick={() => setShowCourseModal(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -150,7 +210,7 @@ const Overview = ({ user }) => {
   useEffect(() => {
     const fetchOverviewData = async () => {
       try {
-        const courseRes = await axios.get('http://localhost:5000/api/courses');
+        const courseRes = await axios.get(`${API_URL}/api/courses`);
         const myCourses = courseRes.data.filter(c => 
           user.role === 'instructor' ? c.instructor._id === user.id : c.students.includes(user.id)
         );
@@ -158,7 +218,7 @@ const Overview = ({ user }) => {
         // Fetch all assignments for all my courses
         let allAssignments = [];
         for (const course of myCourses) {
-          const assignRes = await axios.get(`http://localhost:5000/api/assignments/course/${course._id}`);
+          const assignRes = await axios.get(`${API_URL}/api/assignments/course/${course._id}`);
           allAssignments = [...allAssignments, ...assignRes.data];
         }
 

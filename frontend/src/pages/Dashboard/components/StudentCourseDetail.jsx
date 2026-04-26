@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_URL from '../../../config';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FileText, BookOpen, Clock, Download, ExternalLink } from 'lucide-react';
 
@@ -13,14 +14,14 @@ const StudentCourseDetail = () => {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/courses');
+        const res = await axios.get(`${API_URL}/api/courses`);
         const found = res.data.find(c => c._id === id);
         setCourse(found);
         
-        const assignRes = await axios.get(`http://localhost:5000/api/assignments/course/${id}`);
+        const assignRes = await axios.get(`${API_URL}/api/assignments/course/${id}`);
         setAssignments(assignRes.data);
 
-        const subRes = await axios.get('http://localhost:5000/api/submissions/my');
+        const subRes = await axios.get(`${API_URL}/api/submissions/my`);
         setSubmissions(subRes.data);
       } catch (err) {
         console.error(err);

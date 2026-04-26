@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_URL from '../../../config';
 import { Bell, Info, AlertTriangle, CheckCircle } from 'lucide-react';
 
 const Notifications = () => {
@@ -8,7 +9,7 @@ const Notifications = () => {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/notifications');
+        const res = await axios.get(`${API_URL}/api/notifications`);
         setNotifications(res.data);
       } catch (err) {
         console.error(err);

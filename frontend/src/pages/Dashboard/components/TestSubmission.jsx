@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_URL from '../../../config';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Send, Clock, BookOpen, AlertCircle, FileText, Download } from 'lucide-react';
 
@@ -14,7 +15,7 @@ const TestSubmission = () => {
   useEffect(() => {
     const fetchAssignment = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/assignments/all`);
+        const res = await axios.get(`${API_URL}/api/assignments/all`);
         const found = res.data.find(a => a._id === assignmentId);
         setAssignment(found);
       } catch (err) {
@@ -33,7 +34,7 @@ const TestSubmission = () => {
     if (file) formData.append('file', file);
 
     try {
-      await axios.post('http://localhost:5000/api/submissions', formData, {
+      await axios.post(`${API_URL}/api/submissions`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       alert('Assignment submitted successfully!');

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_URL from '../../../config';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
-import { BookOpen, Users, Clock, ArrowUpRight, ExternalLink } from 'lucide-react';
+import { BookOpen, Users, Clock, ArrowUpRight, ExternalLink, PlusCircle } from 'lucide-react';
 
-const CourseList = () => {
+const CourseList = ({ setShowCourseModal }) => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
@@ -16,7 +17,7 @@ const CourseList = () => {
 
   const fetchCourses = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/courses');
+      const res = await axios.get(`${API_URL}/api/courses`);
       setCourses(res.data);
     } catch (err) {
       console.error(err);
@@ -32,7 +33,7 @@ const CourseList = () => {
 
   const handleEnroll = async (id) => {
     try {
-      await axios.post(`http://localhost:5000/api/courses/${id}/enroll`);
+      await axios.post(`${API_URL}/api/courses/${id}/enroll`);
       alert('Successfully enrolled!');
       fetchCourses();
     } catch (err) {
@@ -50,6 +51,30 @@ const CourseList = () => {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
+        {user.role === 'instructor' && (
+          <div 
+            className="glass card" 
+            style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              justifyContent: 'center', 
+              alignItems: 'center', 
+              gap: '16px', 
+              border: '2px dashed var(--glass-border)',
+              cursor: 'pointer',
+              minHeight: '300px'
+            }}
+            onClick={() => setShowCourseModal(true)}
+          >
+            <div style={{ padding: '20px', background: 'rgba(99, 102, 241, 0.1)', borderRadius: '50%' }}>
+              <PlusCircle size={40} color="var(--primary)" />
+            </div>
+            <div style={{ textAlign: 'center' }}>
+              <h4 style={{ fontSize: '1.2rem', marginBottom: '4px' }}>Create New Course</h4>
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Add a new class for your students</p>
+            </div>
+          </div>
+        )}
         {courses.map((course) => (
           <div key={course._id} className="glass card" style={{ display: 'flex', flexDirection: 'column' }}>
             <div style={{ height: '160px', background: 'rgba(255,255,255,0.02)', borderRadius: '12px', marginBottom: '16px', position: 'relative', overflow: 'hidden' }}>
